@@ -26,6 +26,9 @@ export function apply(ctx, config = {}) {
     `- ${windowsPathRule(user)}`,
     "- Prefer the selected workspace and {{cwd}}. Do not scan the entire Windows home or Desktop unless asked.",
     "- Node, git, python, and package managers mean the Linux copies in this distro, not the Windows ones.",
+    "- Files under /mnt/c often have CRLF endings. Strip carriage returns before running a script with bash.",
+    "- Prefer {{cwd}} and /home for git and new files. Do not treat /mnt/c as the daily working tree unless asked.",
+    "- Node 24 fetch ignores HTTP_PROXY/HTTPS_PROXY unless NODE_USE_ENV_PROXY=1. Set that when a Node script must use the proxy.",
   ].join("\n");
 
   if (extra) {

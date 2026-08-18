@@ -4,6 +4,8 @@ DeepSeek Harness plugin: inject **WSL / Windows** path and shell facts into the 
 
 给「浏览器在 Windows、agent 在 WSL」的环境用。模型默认不知道自己跑在 Linux 里，容易去用 `C:\`、PowerShell，或把 Windows 盘当工作区扫一遍。
 
+注入内容（保持很短）：发行版与用户、Linux 路径映射、`/mnt/c` 的 CRLF、不要把 Windows 盘当日常 git 树、Node 24 要用代理时设 `NODE_USE_ENV_PROXY=1`。
+
 ## Install
 
 Already running `dsh web`:
@@ -43,6 +45,11 @@ Non-WSL hosts skip injection by default. To force it, override the whole row in 
 | `when` | `wsl` | Inject only in WSL, or `always`. |
 | `order` | `15` | Prompt section order (after persona `0`, before tool guidance `100–199`). |
 | `extraNotes` | `""` | Optional extra operator notes appended to the section. |
+
+## Changelog
+
+- **0.2.0** — also warn about CRLF on `/mnt/c`, git on the Windows mount, and `NODE_USE_ENV_PROXY` for Node 24.
+- **0.1.0** — first release: distro, Linux paths, `C:\` → `/mnt/c`.
 
 ## Topics
 
