@@ -1,0 +1,7 @@
+- insert:
+    - id: dsh-wsl-env
+      name: dsh-wsl-env
+      config:
+        when: wsl
+        order: 15
+        extraNotes: ""
