@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { detectWsl, windowsPathRule } from "../lib/wsl.js";
+import { detectWsl, resolveWindowsUser, userFromWindowsHome, windowsPathRule } from "../lib/wsl.js";
 
 describe("detectWsl", () => {
   it("trusts WSL_DISTRO_NAME", () => {
@@ -32,5 +32,31 @@ describe("windowsPathRule", () => {
     const text = windowsPathRule("rchua", { exists: () => false });
     assert.match(text, /C:\\Users\\name\\project/);
     assert.match(text, /\/mnt\/c\/Users\/name\/project/);
+  });
+});
+
+describe("userFromWindowsHome", () => {
+  it("reads the Windows username from USERPROFILE", () => {
+    assert.equal(userFromWindowsHome("C:\\Users\\rchua"), "rchua");
+    assert.equal(userFromWindowsHome("/mnt/c/Users/rchua"), "rchua");
+    assert.equal(userFromWindowsHome(""), "");
+  });
+});
+
+describe("resolveWindowsUser", () => {
+  it("prefers USERPROFILE when that Windows home is mounted", () => {
+    const name = resolveWindowsUser("linuxuser", {
+      env: { USERPROFILE: "C:\\Users\\rchua" },
+      exists: (p) => p === "/mnt/c/Users/rchua",
+    });
+    assert.equal(name, "rchua");
+  });
+
+  it("falls back to the Linux username when that home is mounted", () => {
+    const name = resolveWindowsUser("rchua", {
+      env: {},
+      exists: (p) => p === "/mnt/c/Users/rchua",
+    });
+    assert.equal(name, "rchua");
   });
 });

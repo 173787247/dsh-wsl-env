@@ -1,5 +1,5 @@
 import os from "node:os";
-import { detectWsl, windowsPathRule } from "./lib/wsl.js";
+import { detectWsl, resolveWindowsUser, windowsPathRule } from "./lib/wsl.js";
 
 export const name = "dsh-wsl-env";
 export const inject = ["systemPrompt"];
@@ -16,14 +16,15 @@ export function apply(ctx, config = {}) {
   }
 
   const distro = process.env.WSL_DISTRO_NAME || "WSL";
-  const user = os.userInfo().username;
+  const linuxUser = os.userInfo().username;
+  const windowsUser = resolveWindowsUser(linuxUser);
   let text = [
-    `You are running inside Windows Subsystem for Linux (${distro}) as ${user}.`,
+    `You are running inside Windows Subsystem for Linux (${distro}) as ${linuxUser}.`,
     "The browser may be on Windows, but tools and the shell run in Linux.",
     "",
     "Path and shell rules:",
     "- Use bash and Linux paths. Do not use PowerShell, cmd.exe, or Windows drive letters as command paths.",
-    `- ${windowsPathRule(user)}`,
+    `- ${windowsPathRule(windowsUser || linuxUser)}`,
     "- Prefer the selected workspace and {{cwd}}. Do not scan the entire Windows home or Desktop unless asked.",
     "- Node, git, python, and package managers mean the Linux copies in this distro, not the Windows ones.",
     "- Files under /mnt/c often have CRLF endings. Strip carriage returns before running a script with bash.",
