@@ -48,8 +48,15 @@ Non-WSL hosts skip injection by default. To force it, override the whole row in 
 
 ## Changelog
 
+- **0.2.1** — map `C:\Users` from `USERPROFILE` when the Linux username differs; fall back to `/etc/os-release` when `WSL_DISTRO_NAME` is missing.
 - **0.2.0** — also warn about CRLF on `/mnt/c`, git on the Windows mount, and `NODE_USE_ENV_PROXY` for Node 24.
 - **0.1.0** — first release: distro, Linux paths, `C:\` → `/mnt/c`.
+
+## Test
+
+```sh
+npm test
+```
 
 ## Topics
 

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { detectWsl, resolveWindowsUser, userFromWindowsHome, windowsPathRule } from "../lib/wsl.js";
+import { detectWsl, distroName, resolveWindowsUser, userFromWindowsHome, windowsPathRule } from "../lib/wsl.js";
 
 describe("detectWsl", () => {
   it("trusts WSL_DISTRO_NAME", () => {
@@ -58,5 +58,20 @@ describe("resolveWindowsUser", () => {
       exists: (p) => p === "/mnt/c/Users/rchua",
     });
     assert.equal(name, "rchua");
+  });
+});
+
+describe("distroName", () => {
+  it("prefers WSL_DISTRO_NAME", () => {
+    assert.equal(distroName({ env: { WSL_DISTRO_NAME: "Ubuntu-24.04" }, readOsReleaseFile: () => { throw new Error("unused"); } }), "Ubuntu-24.04");
+  });
+
+  it("reads PRETTY_NAME from os-release when the env var is missing", () => {
+    const text = 'NAME="Ubuntu"\nPRETTY_NAME="Ubuntu 24.04.3 LTS"\n';
+    assert.equal(distroName({ env: {}, readOsReleaseFile: () => text }), "Ubuntu 24.04.3 LTS");
+  });
+
+  it("falls back to WSL when os-release is missing", () => {
+    assert.equal(distroName({ env: {}, readOsReleaseFile: () => { throw new Error("ENOENT"); } }), "WSL");
   });
 });

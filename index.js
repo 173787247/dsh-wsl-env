@@ -1,5 +1,5 @@
 import os from "node:os";
-import { detectWsl, resolveWindowsUser, windowsPathRule } from "./lib/wsl.js";
+import { detectWsl, distroName, resolveWindowsUser, windowsPathRule } from "./lib/wsl.js";
 
 export const name = "dsh-wsl-env";
 export const inject = ["systemPrompt"];
@@ -15,7 +15,7 @@ export function apply(ctx, config = {}) {
     return;
   }
 
-  const distro = process.env.WSL_DISTRO_NAME || "WSL";
+  const distro = distroName();
   const linuxUser = os.userInfo().username;
   const windowsUser = resolveWindowsUser(linuxUser);
   let text = [
