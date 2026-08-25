@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
 import os from "node:os";
+import { detectWsl, windowsPathRule } from "./lib/wsl.js";
 
 export const name = "dsh-wsl-env";
 export const inject = ["systemPrompt"];
@@ -40,24 +40,4 @@ export function apply(ctx, config = {}) {
     order,
     text,
   });
-}
-
-function windowsPathRule(user) {
-  const linuxHome = `/mnt/c/Users/${user}`;
-  if (existsSync(linuxHome)) {
-    return `A Windows path such as C:\\Users\\${user}\\project is ${linuxHome}/project in this environment.`;
-  }
-  return "A Windows path such as C:\\Users\\name\\project is /mnt/c/Users/name/project in this environment.";
-}
-
-function detectWsl() {
-  if (process.env.WSL_DISTRO_NAME || process.env.WSL_INTEROP) {
-    return true;
-  }
-  try {
-    const release = readFileSync("/proc/sys/kernel/osrelease", "utf8");
-    return /microsoft/i.test(release);
-  } catch {
-    return false;
-  }
 }
