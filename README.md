@@ -2,62 +2,113 @@
 
 DeepSeek Harness plugin: inject **WSL / Windows** path and shell facts into the system prompt.
 
-给「浏览器在 Windows、agent 在 WSL」的环境用。模型默认不知道自己跑在 Linux 里，容易去用 `C:\`、PowerShell，或把 Windows 盘当工作区扫一遍。
+Part of **[dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit)**.
 
-注入内容（保持很短）：发行版与用户、Linux 路径映射、`/mnt/c` 的 CRLF、不要把 Windows 盘当日常 git 树、Node 24 要用代理时设 `NODE_USE_ENV_PROXY=1`。
+[中文说明 ↓](#中文)
 
-## Install
+---
 
-Already running `dsh web`:
+## English
+
+### Why
+
+The model often assumes a Windows shell (`C:\`, PowerShell) even when the agent runs in Linux/WSL. This plugin adds a short system-prompt section so it prefers Linux paths, understands `/mnt/c`, and knows about Node 24 proxy quirks.
+
+### What gets injected
+
+Kept short on purpose:
+
+- Distro name and Linux user
+- Linux path mapping (`C:\Users\...` → `/mnt/c/Users/...`)
+- CRLF / git caveats on `/mnt/c`
+- Prefer Linux home over the Windows mount for day-to-day work
+- `NODE_USE_ENV_PROXY=1` when Node 24 must use `HTTP(S)_PROXY`
+
+### Install
 
 ```sh
 dsh plugin --profile web add github:173787247/dsh-wsl-env
-# or a local checkout:
+# or:
 dsh plugin --profile web add /absolute/path/to/dsh-wsl-env
 ```
 
-Restart `dsh web`. Existing sessions keep the old prompt; open a **new** session.
+Restart `dsh web`. Open a **new** session (existing sessions keep the old prompt).
 
-## Verify
+### Verify
 
-1. Send any message (Trajectory is empty until there is a turn).
-2. Open **Trajectory** → click **SYSTEM / Initial System Prompt**.
-3. Switch from the **Tools** tab to **System Prompt**.
-4. Search for `Windows Subsystem for Linux`.
+1. Send any message.
+2. Trajectory → **SYSTEM** → **System Prompt** (not the Tools tab).
+3. Search for `Windows Subsystem for Linux`.
 
-You should see the distro name (for example `Ubuntu-24.04`), Linux path rules, and a `C:\Users\...` → `/mnt/c/Users/...` mapping. The UI concatenates sections, so the internal name `runtime:wsl-windows` may not appear as a heading.
+You should see the distro name and path mapping. The UI concatenates sections, so the internal id `runtime:wsl-windows` may not appear as a heading.
 
-Non-WSL hosts skip injection by default. To force it, override the whole row in the profile `cordis.patch.yml` (later layers replace the entire `config`, so restate every key you still want):
+Non-WSL hosts skip injection by default (`when: wsl`).
+
+### Config
+
+Later profile layers that set `config` **replace the whole object**—restate every key you keep:
 
 ```yaml
 - id: dsh-wsl-env
   name: dsh-wsl-env
   config:
-    when: always
+    when: wsl          # or: always
     order: 15
     extraNotes: "Prefer /home over /mnt/c for new files."
 ```
 
-## Config
-
 | Key | Default | Meaning |
-|---|---|---|
-| `when` | `wsl` | Inject only in WSL, or `always`. |
-| `order` | `15` | Prompt section order (after persona `0`, before tool guidance `100–199`). |
-| `extraNotes` | `""` | Optional extra operator notes appended to the section. |
+|-----|---------|---------|
+| `when` | `wsl` | Inject only in WSL, or `always` |
+| `order` | `15` | Prompt section order |
+| `extraNotes` | `""` | Extra operator notes appended to the section |
 
-## Changelog
-
-- **0.2.1** — map `C:\Users` from `USERPROFILE` when the Linux username differs; fall back to `/etc/os-release` when `WSL_DISTRO_NAME` is missing.
-- **0.2.0** — also warn about CRLF on `/mnt/c`, git on the Windows mount, and `NODE_USE_ENV_PROXY` for Node 24.
-- **0.1.0** — first release: distro, Linux paths, `C:\` → `/mnt/c`.
-
-## Test
+### Test
 
 ```sh
 npm test
 ```
 
-## Topics
+### License
 
-On GitHub, add `dsh-plugin`.
+MIT
+
+---
+
+## 中文
+
+### 为什么需要
+
+Agent 跑在 WSL（Linux）里时，模型仍常按 Windows 习惯写 `C:\`、PowerShell。本插件往 system prompt 注入一小段事实，让它优先用 Linux 路径，并了解 `/mnt/c` 与 Node 24 代理注意点。
+
+### 注入内容
+
+- 发行版与 Linux 用户
+- 路径映射（`C:\Users\...` → `/mnt/c/Users/...`）
+- `/mnt/c` 上的 CRLF / git 注意点
+- 日常工作优先家目录，而不是 Windows 盘
+- 需要代理时提醒 `NODE_USE_ENV_PROXY=1`
+
+### 安装
+
+```sh
+dsh plugin --profile web add github:173787247/dsh-wsl-env
+```
+
+重启 `dsh web`，并开**新会话**。
+
+### 验证
+
+Trajectory → SYSTEM → System Prompt，搜索 `Windows Subsystem for Linux`。
+
+### 配置
+
+| 键 | 默认 | 含义 |
+|----|------|------|
+| `when` | `wsl` | 仅 WSL 注入，或 `always` |
+| `order` | `15` | 段落顺序 |
+| `extraNotes` | `""` | 追加运维说明 |
+
+### 许可
+
+MIT
