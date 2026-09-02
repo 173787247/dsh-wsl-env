@@ -1,6 +1,6 @@
 {
   "name": "dsh-wsl-env",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Inject WSL/Windows path and shell facts into the DeepSeek Harness system prompt.",
   "license": "MIT",
   "repository": {
@@ -24,6 +24,7 @@
     "lib",
     "cordis.patch.yml",
     "README.md",
+    "README.zh.md",
     "LICENSE"
   ],
   "keywords": [
