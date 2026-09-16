@@ -8,6 +8,18 @@ DeepSeek Harness 插件：把 **WSL / Windows** 路径与 shell 事实注入 sys
 
 [English → README.md](./README.md)
 
+## 在套件里的位置
+
+把 WSL 和 Windows 路径事实写进 system prompt。模型不会去调用它。
+
+```mermaid
+flowchart LR
+  facts["WSL 与 Windows 事实"] --> env["dsh-wsl-env"] --> prompt["system prompt"]
+```
+
+整套关系图和版本快照：[dsh-wsl-kit 中文说明](https://github.com/173787247/dsh-wsl-kit/blob/master/README.zh.md)。本插件是 **0.3.0**（daily，也在 llm）。不要把那份总表抄进本 README。
+
+
 ---
 ## 兼容性
 

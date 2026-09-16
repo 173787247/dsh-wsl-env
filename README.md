@@ -8,6 +8,18 @@ Part of **[dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit)**.
 
 [中文说明 → README.zh.md](./README.zh.md)
 
+## Where it sits
+
+Injects WSL and Windows path facts into the system prompt. It is not a tool the model calls.
+
+```mermaid
+flowchart LR
+  facts["WSL and Windows facts"] --> env["dsh-wsl-env"] --> prompt["system prompt"]
+```
+
+Suite diagram and version snapshot: [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit#how-the-pieces-fit). This plugin is **0.3.0** (daily; also in llm). Do not copy that matrix into this README.
+
+
 ---
 ## Compatibility
 
