@@ -23,13 +23,13 @@ describe("detectWsl", () => {
 
 describe("windowsPathRule", () => {
   it("uses the Linux username when /mnt/c/Users/<user> exists", () => {
-    const text = windowsPathRule("rchua", { exists: (p) => p === "/mnt/c/Users/rchua" });
-    assert.match(text, /C:\\Users\\rchua\\project/);
-    assert.match(text, /\/mnt\/c\/Users\/rchua\/project/);
+    const text = windowsPathRule("alice", { exists: (p) => p === "/mnt/c/Users/alice" });
+    assert.match(text, /C:\\Users\\alice\\project/);
+    assert.match(text, /\/mnt\/c\/Users\/alice\/project/);
   });
 
   it("falls back to a generic mapping when that home is missing", () => {
-    const text = windowsPathRule("rchua", { exists: () => false });
+    const text = windowsPathRule("alice", { exists: () => false });
     assert.match(text, /C:\\Users\\name\\project/);
     assert.match(text, /\/mnt\/c\/Users\/name\/project/);
   });
@@ -37,8 +37,8 @@ describe("windowsPathRule", () => {
 
 describe("userFromWindowsHome", () => {
   it("reads the Windows username from USERPROFILE", () => {
-    assert.equal(userFromWindowsHome("C:\\Users\\rchua"), "rchua");
-    assert.equal(userFromWindowsHome("/mnt/c/Users/rchua"), "rchua");
+    assert.equal(userFromWindowsHome("C:\\Users\\alice"), "alice");
+    assert.equal(userFromWindowsHome("/mnt/c/Users/alice"), "alice");
     assert.equal(userFromWindowsHome(""), "");
   });
 });
@@ -46,18 +46,18 @@ describe("userFromWindowsHome", () => {
 describe("resolveWindowsUser", () => {
   it("prefers USERPROFILE when that Windows home is mounted", () => {
     const name = resolveWindowsUser("linuxuser", {
-      env: { USERPROFILE: "C:\\Users\\rchua" },
-      exists: (p) => p === "/mnt/c/Users/rchua",
+      env: { USERPROFILE: "C:\\Users\\alice" },
+      exists: (p) => p === "/mnt/c/Users/alice",
     });
-    assert.equal(name, "rchua");
+    assert.equal(name, "alice");
   });
 
   it("falls back to the Linux username when that home is mounted", () => {
-    const name = resolveWindowsUser("rchua", {
+    const name = resolveWindowsUser("alice", {
       env: {},
-      exists: (p) => p === "/mnt/c/Users/rchua",
+      exists: (p) => p === "/mnt/c/Users/alice",
     });
-    assert.equal(name, "rchua");
+    assert.equal(name, "alice");
   });
 });
 
